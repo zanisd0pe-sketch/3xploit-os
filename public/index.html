@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3XPLOIT_OS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#a855f7">
+  <script>if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js");</script>
+</head>
+<body>
+  <canvas id="matrix-canvas"></canvas>
+  <div id="app">
+    <header id="topbar">
+      <span class="logo">3XPLOIT_OS</span>
+      <nav id="tabs">
+        <button class="tab active" data-tab="chat">[ CHAT ]</button>
+        <button class="tab" data-tab="terminal">[ TERMINAL ]</button>
+        <button class="tab" data-tab="dev">[ DEV TOOLS ]</button>
+      </nav>
+      <div id="status">
+        <span id="status-dot"></span>
+        <span id="status-text">ONLINE</span>
+      </div>
+    </header>
+    <section id="chat-panel" class="panel active">
+      <div id="messages"></div>
+      <div id="input-area">
+        <textarea id="user-input" placeholder="// enter command..." rows="1"></textarea>
+        <button id="send-btn">SEND</button>
+      </div>
+    </section>
+    <section id="terminal-panel" class="panel">
+      <div id="term-output"></div>
+      <div id="term-input-row">
+        <span class="prompt-label">root@3xploit:~$</span>
+        <input id="term-input" type="text" autocomplete="off" spellcheck="false">
+      </div>
+    </section>
+    <section id="dev-panel" class="panel">
+      <div id="dev-tools">
+        <div class="dev-card">
+          <div class="dev-card-title">// APP GENERATOR</div>
+          <p class="dev-card-desc">Describe an app and AI will scaffold it.</p>
+          <textarea id="app-desc" placeholder="e.g. a todo app with dark mode..." rows="3"></textarea>
+          <button class="dev-btn" onclick="generateApp()">GENERATE</button>
+          <pre id="app-output" class="code-output"></pre>
+        </div>
+        <div class="dev-card">
+          <div class="dev-card-title">// CODE EXPLAINER</div>
+          <p class="dev-card-desc">Paste code and AI will explain it.</p>
+          <textarea id="code-input" placeholder="paste your code here..." rows="5"></textarea>
+          <button class="dev-btn" onclick="explainCode()">EXPLAIN</button>
+          <pre id="code-output" class="code-output"></pre>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Floating AI Bubble -->
+  <div id="ai-bubble-btn" onclick="toggleAiBubble()">🤖</div>
+  <div id="ai-bubble">
+    <div id="ai-bubble-header">
+      <span>// 3XPLOIT_AI</span>
+      <button onclick="toggleAiBubble()">✕</button>
+    </div>
+    <div id="ai-bubble-messages"></div>
+    <div id="ai-bubble-input-row">
+      <input id="ai-bubble-input" type="text" placeholder="ask AI..." autocomplete="off">
+      <button onclick="sendBubbleMessage()">▶</button>
+    </div>
+  </div>
+
+  <script src="/js/matrix.js"></script>
+  <script src="/js/chat.js"></script>
+  <script src="/js/terminal.js"></script>
+  <script src="/js/devtools.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

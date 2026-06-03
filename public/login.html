@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3XPLOIT_OS // ACCESS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#07000f;font-family:'Share Tech Mono',monospace;color:#e9d5ff;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;opacity:.35;pointer-events:none}
+    .box{position:relative;z-index:1;background:#0f0020;border:1px solid #7c3aed88;border-radius:8px;padding:32px 28px;width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;gap:16px}
+    .logo{font-family:'VT323',monospace;font-size:32px;color:#a855f7;letter-spacing:4px;text-align:center;text-shadow:0 0 20px #a855f7,0 0 40px #7c3aed55;animation:glitch 3s infinite}
+    @keyframes glitch{0%,95%,100%{text-shadow:0 0 20px #a855f7,0 0 40px #7c3aed55}96%{text-shadow:-2px 0 #ff00ff,2px 0 #00ffff}97%{text-shadow:2px 0 #ff00ff,-2px 0 #00ffff}98%{text-shadow:-2px 0 #ff00ff,2px 0 #00ffff}}
+    .sub{font-size:11px;color:#7c3aed;letter-spacing:2px}
+    .divider{width:100%;height:1px;background:#7c3aed44}
+    .display{width:100%;background:#0a0018;border:1px solid #7c3aed44;border-radius:4px;padding:14px;text-align:center;font-size:32px;letter-spacing:12px;color:#a855f7;min-height:58px;font-family:'VT323',monospace}
+    .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
+    .key{background:#1a0030;border:1px solid #7c3aed55;color:#e9d5ff;font-family:'VT323',monospace;font-size:28px;padding:16px;border-radius:6px;cursor:pointer;transition:all .1s;text-align:center;user-select:none}
+    .key:active,.key.pressed{background:#7c3aed33;border-color:#a855f7;color:#a855f7;transform:scale(0.95)}
+    .key.clear{color:#f87171;border-color:#f8717155}
+    .key.enter{color:#4ade80;border-color:#4ade8055;grid-column:span 2}
+    #error{font-size:11px;color:#f87171;letter-spacing:1px;min-height:16px;text-align:center;animation:none}
+    .shake{animation:shake .3s ease!important}
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div class="box">
+    <div class="logo">3XPLOIT_OS</div>
+    <div class="sub">// ENTER ACCESS CODE //</div>
+    <div class="divider"></div>
+    <div class="display" id="display">▮</div>
+    <div class="keypad">
+      <div class="key" onclick="press('1')">1</div>
+      <div class="key" onclick="press('2')">2</div>
+      <div class="key" onclick="press('3')">3</div>
+      <div class="key" onclick="press('4')">4</div>
+      <div class="key" onclick="press('5')">5</div>
+      <div class="key" onclick="press('6')">6</div>
+      <div class="key" onclick="press('7')">7</div>
+      <div class="key" onclick="press('8')">8</div>
+      <div class="key" onclick="press('9')">9</div>
+      <div class="key clear" onclick="clear_()">CLR</div>
+      <div class="key" onclick="press('0')">0</div>
+      <div class="key enter" onclick="login()">ENTER ▶</div>
+    </div>
+    <div id="error"></div>
+  </div>
+  <script>
+    const canvas=document.getElementById('c');
+    const ctx=canvas.getContext('2d');
+    const chars='アイウエオ0123456789ABCDEF<>{}|';
+    let drops=[];
+    function init(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;drops=Array(Math.floor(canvas.width/18)).fill(0).map(()=>Math.random()*-60);}
+    function draw(){ctx.fillStyle='rgba(7,0,15,0.05)';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.font='16px "Share Tech Mono",monospace';drops.forEach((y,i)=>{ctx.fillStyle=`rgba(168,85,247,${Math.random()>.85?1:.5})`;ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*18,y*18);if(y*18>canvas.height&&Math.random()>.975)drops[i]=0;drops[i]+=.4;});}
+    init();window.addEventListener('resize',init);setInterval(draw,50);
+
+    let code='';
+    const display=document.getElementById('display');
+
+    function press(num){
+      if(code.length>=8)return;
+      code+=num;
+      display.textContent='●'.repeat(code.length);
+    }
+
+    function clear_(){
+      code='';
+      display.textContent='▮';
+    }
+
+    async function login(){
+      if(!code)return;
+      const err=document.getElementById('error');
+      err.textContent='';
+      try{
+        const res=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:code})});
+        const data=await res.json();
+        if(data.success){
+          localStorage.setItem('neural_token',data.token);
+          window.location.href='/';
+        }else{
+          code='';
+          display.textContent='▮';
+          err.textContent='ACCESS DENIED';
+          display.classList.add('shake');
+          setTimeout(()=>display.classList.remove('shake'),300);
+        }
+      }catch{err.textContent='ERROR: cannot reach server';}
+    }
+
+    document.addEventListener('keydown',e=>{
+      if(e.key>='0'&&e.key<='9')press(e.key);
+      if(e.key==='Enter')login();
+      if(e.key==='Backspace'){code=code.slice(0,-1);display.textContent=code?'●'.repeat(code.length):'▮';}
+    });
+  </script>
+</body>
+</html>
