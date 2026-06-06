@@ -50,3 +50,10 @@ app.post('/api/chat', authMiddleware, async (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`NEURAL_OS running on http://localhost:${PORT}`));
+
+app.post('/api/update-password', authMiddleware, (req, res) => {
+  const { password } = req.body;
+  if (!password) return res.status(400).json({ error: 'No password provided' });
+  process.env.APP_PASSWORD = password;
+  res.json({ success: true });
+});

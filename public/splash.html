@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3XPLOIT_OS</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#07000f;display:flex;align-items:center;justify-content:center;height:100vh;overflow:hidden;font-family:'Share Tech Mono',monospace}
+    canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+    .center{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:16px}
+    svg.mask{width:220px;height:220px;filter:drop-shadow(0 0 20px #a855f7) drop-shadow(0 0 40px #7c3aed)}
+    .title{font-size:28px;color:#a855f7;letter-spacing:6px;text-shadow:0 0 20px #a855f7;animation:glitch 3s infinite;font-family:monospace}
+    .sub{font-size:11px;color:#7c3aed;letter-spacing:3px;animation:pulse 2s infinite}
+    @keyframes glitch{0%,95%,100%{text-shadow:0 0 20px #a855f7}96%{text-shadow:-2px 0 #ff00ff,2px 0 #00ffff}97%{text-shadow:2px 0 #ff00ff,-2px 0 #00ffff}}
+    @keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}
+    .bar{width:180px;height:2px;background:#1a0030;border-radius:2px;overflow:hidden;margin-top:8px}
+    .fill{height:100%;background:linear-gradient(90deg,#7c3aed,#a855f7);animation:load 2.5s ease forwards}
+    @keyframes load{0%{width:0%}100%{width:100%}}
+  </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="center">
+  <svg class="mask" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <!-- Mask face -->
+    <ellipse cx="100" cy="105" rx="72" ry="85" fill="#0f0020" stroke="#a855f7" stroke-width="2"/>
+    <!-- Forehead detail -->
+    <path d="M55 60 Q100 20 145 60" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+    <path d="M60 55 Q100 15 140 55" fill="none" stroke="#6d28d9" stroke-width="0.8" opacity="0.5"/>
+    <!-- Eyes -->
+    <ellipse cx="72" cy="90" rx="18" ry="10" fill="#07000f" stroke="#a855f7" stroke-width="1.5"/>
+    <ellipse cx="128" cy="90" rx="18" ry="10" fill="#07000f" stroke="#a855f7" stroke-width="1.5"/>
+    <!-- Eye glow -->
+    <ellipse cx="72" cy="90" rx="10" ry="5" fill="#a855f7" opacity="0.8">
+      <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="128" cy="90" rx="10" ry="5" fill="#a855f7" opacity="0.8">
+      <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
+    </ellipse>
+    <!-- Nose -->
+    <path d="M95 100 L100 115 L105 100" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+    <!-- Mouth grid -->
+    <rect x="68" y="125" width="64" height="22" rx="4" fill="#0a0018" stroke="#a855f7" stroke-width="1.5"/>
+    <line x1="68" y1="133" x2="132" y2="133" stroke="#7c3aed" stroke-width="0.8"/>
+    <line x1="68" y1="140" x2="132" y2="140" stroke="#7c3aed" stroke-width="0.8"/>
+    <line x1="84" y1="125" x2="84" y2="147" stroke="#7c3aed" stroke-width="0.8"/>
+    <line x1="100" y1="125" x2="100" y2="147" stroke="#7c3aed" stroke-width="0.8"/>
+    <line x1="116" y1="125" x2="116" y2="147" stroke="#7c3aed" stroke-width="0.8"/>
+    <!-- Circuit lines -->
+    <path d="M28 90 L55 90" stroke="#7c3aed" stroke-width="1" opacity="0.6"/>
+    <path d="M28 90 L28 130 L45 130" stroke="#7c3aed" stroke-width="1" opacity="0.6"/>
+    <circle cx="28" cy="90" r="3" fill="#a855f7"/>
+    <path d="M172 90 L145 90" stroke="#7c3aed" stroke-width="1" opacity="0.6"/>
+    <path d="M172 90 L172 130 L155 130" stroke="#7c3aed" stroke-width="1" opacity="0.6"/>
+    <circle cx="172" cy="90" r="3" fill="#a855f7"/>
+    <!-- Top dots -->
+    <circle cx="100" cy="35" r="3" fill="#a855f7"><animate attributeName="opacity" values="1;0;1" dur="1.5s" repeatCount="indefinite"/></circle>
+    <circle cx="85" cy="40" r="2" fill="#7c3aed" opacity="0.6"/>
+    <circle cx="115" cy="40" r="2" fill="#7c3aed" opacity="0.6"/>
+  </svg>
+  <div class="title">3XPLOIT_OS</div>
+  <div class="sub">// INITIALIZING SYSTEM //</div>
+  <div class="bar"><div class="fill"></div></div>
+</div>
+<script>
+  const c=document.getElementById('c');
+  const ctx=c.getContext('2d');
+  const chars='アイウエオカキクケコ0123456789ABCDEF<>{}[]|/\\';
+  let drops=[];
+  function init(){c.width=window.innerWidth;c.height=window.innerHeight;drops=Array(Math.floor(c.width/18)).fill(0).map(()=>Math.random()*-60);}
+  function draw(){ctx.fillStyle='rgba(7,0,15,0.05)';ctx.fillRect(0,0,c.width,c.height);ctx.font='16px monospace';drops.forEach((y,i)=>{ctx.fillStyle=`rgba(168,85,247,${Math.random()>.85?1:.4})`;ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*18,y*18);if(y*18>c.height&&Math.random()>.975)drops[i]=0;drops[i]+=.4;});}
+  init();window.addEventListener('resize',init);setInterval(draw,50);
+  // Redirect to login after 3 seconds
+  setTimeout(()=>window.location.href='/login.html', 3000);
+</script>
+</body>
+</html>

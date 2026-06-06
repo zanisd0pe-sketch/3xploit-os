@@ -18,20 +18,31 @@
       <nav id="tabs">
         <button class="tab active" data-tab="chat">[ CHAT ]</button>
         <button class="tab" data-tab="terminal">[ TERMINAL ]</button>
-        <button class="tab" data-tab="dev">[ DEV TOOLS ]</button>
+        <button class="tab" data-tab="dev">[ DEV ]</button>
+        <button class="tab" data-tab="review">[ REVIEW ]</button>
       </nav>
-      <div id="status">
-        <span id="status-dot"></span>
-        <span id="status-text">ONLINE</span>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <button onclick="openMemory()" style="background:transparent;border:1px solid #7c3aed55;color:#a855f7;font-family:'Share Tech Mono',monospace;font-size:11px;padding:5px 8px;border-radius:4px;cursor:pointer;">🧠</button>
+        <button onclick="openGithub()" style="background:transparent;border:1px solid #7c3aed55;color:#a855f7;font-family:'Share Tech Mono',monospace;font-size:11px;padding:5px 8px;border-radius:4px;cursor:pointer;">⬆ GIT</button>
+        <button onclick="openSettings()" style="background:transparent;border:1px solid #7c3aed55;color:#a855f7;font-family:'Share Tech Mono',monospace;font-size:11px;padding:5px 8px;border-radius:4px;cursor:pointer;">⚙</button>
+        <div id="status">
+          <span id="status-dot"></span>
+          <span id="status-text">ONLINE</span>
+        </div>
       </div>
     </header>
+
+    <!-- CHAT -->
     <section id="chat-panel" class="panel active">
       <div id="messages"></div>
       <div id="input-area">
-        <textarea id="user-input" placeholder="// enter command..." rows="1"></textarea>
+        <textarea id="user-input" placeholder="// enter command... (try /review /fix /explain)" rows="1"></textarea>
+        <button id="voice-btn" onclick="toggleVoice()" style="background:#7c3aed;color:#f5f3ff;border:none;font-size:16px;padding:0 12px;height:42px;border-radius:4px;cursor:pointer;">🎤</button>
         <button id="send-btn">SEND</button>
       </div>
     </section>
+
+    <!-- TERMINAL -->
     <section id="terminal-panel" class="panel">
       <div id="term-output"></div>
       <div id="term-input-row">
@@ -39,8 +50,36 @@
         <input id="term-input" type="text" autocomplete="off" spellcheck="false">
       </div>
     </section>
+
+    <!-- DEV TOOLS -->
     <section id="dev-panel" class="panel">
-      <div id="dev-tools">
+      <div style="display:flex;gap:8px;padding:10px 16px;border-bottom:1px solid #7c3aed44;flex-shrink:0;flex-wrap:wrap;">
+        <button id="preview-toggle-btn" onclick="togglePreview()" style="background:#1a0030;color:#818cf8;border:1px solid #818cf844;font-family:'Share Tech Mono',monospace;font-size:11px;padding:6px 10px;border-radius:4px;cursor:pointer;">[ LIVE PREVIEW ]</button>
+        <button onclick="openSnippets()" style="background:#1a0030;color:#a855f7;border:1px solid #a855f744;font-family:'Share Tech Mono',monospace;font-size:11px;padding:6px 10px;border-radius:4px;cursor:pointer;">[ SNIPPETS ]</button>
+        <button onclick="exportChat()" style="background:#1a0030;color:#4ade80;border:1px solid #4ade8044;font-family:'Share Tech Mono',monospace;font-size:11px;padding:6px 10px;border-radius:4px;cursor:pointer;">[ EXPORT ]</button>
+      </div>
+      <div id="preview-panel" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+        <div style="display:flex;gap:0;flex:1;overflow:hidden;">
+          <div style="flex:1;display:flex;flex-direction:column;border-right:1px solid #7c3aed44;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#0a0018;border-bottom:1px solid #7c3aed44;">
+              <span style="font-size:10px;color:#7c3aed;letter-spacing:1px;">// HTML EDITOR</span>
+              <div style="display:flex;gap:6px;">
+                <button onclick="updatePreview()" style="background:#7c3aed;color:#f5f3ff;border:none;font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 8px;border-radius:3px;cursor:pointer;">RUN</button>
+                <button onclick="copyPreviewCode()" style="background:#1a0030;color:#4ade80;border:1px solid #4ade8044;font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 8px;border-radius:3px;cursor:pointer;">COPY</button>
+                <button onclick="loadGithubFromPreview();openGithub();" style="background:#1a0030;color:#818cf8;border:1px solid #818cf844;font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 8px;border-radius:3px;cursor:pointer;">→ GIT</button>
+              </div>
+            </div>
+            <textarea id="preview-code" style="flex:1;background:#07000f;color:#c4b5fd;font-family:'Share Tech Mono',monospace;font-size:12px;padding:10px;border:none;outline:none;resize:none;line-height:1.6;" placeholder="// paste HTML here...&#10;// click RUN to preview"></textarea>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;">
+            <div style="padding:6px 10px;background:#0a0018;border-bottom:1px solid #7c3aed44;">
+              <span style="font-size:10px;color:#7c3aed;letter-spacing:1px;">// LIVE PREVIEW</span>
+            </div>
+            <iframe id="preview-frame" style="flex:1;border:none;background:#fff;"></iframe>
+          </div>
+        </div>
+      </div>
+      <div id="dev-tools" style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px;overflow-y:auto;">
         <div class="dev-card">
           <div class="dev-card-title">// APP GENERATOR</div>
           <p class="dev-card-desc">Describe an app and AI will scaffold it.</p>
@@ -55,6 +94,20 @@
           <button class="dev-btn" onclick="explainCode()">EXPLAIN</button>
           <pre id="code-output" class="code-output"></pre>
         </div>
+      </div>
+    </section>
+
+    <!-- CODE REVIEW -->
+    <section id="review-panel" class="panel">
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:16px;overflow-y:auto;">
+        <div style="font-family:'VT323',monospace;font-size:22px;color:#a855f7;letter-spacing:3px;">// AI CODE REVIEW</div>
+        <textarea id="review-input" style="background:#0f0020;border:1px solid #7c3aed55;color:#e9d5ff;font-family:'Share Tech Mono',monospace;font-size:12px;padding:12px;border-radius:4px;resize:vertical;outline:none;min-height:180px;" placeholder="// paste your code here for AI review..."></textarea>
+        <div style="display:flex;gap:8px;">
+          <button id="review-btn" class="dev-btn" onclick="reviewCode()">REVIEW ▶</button>
+          <button id="optimize-btn" class="dev-btn" onclick="optimizeCode()" style="background:#1a0030;color:#4ade80;border:1px solid #4ade8044;">OPTIMIZE ▶</button>
+          <button onclick="loadGithubFromChat();openGithub();" class="dev-btn" style="background:#1a0030;color:#818cf8;border:1px solid #818cf844;">→ GITHUB</button>
+        </div>
+        <pre id="review-output" class="code-output"></pre>
       </div>
     </section>
   </div>
@@ -73,10 +126,109 @@
     </div>
   </div>
 
+  <!-- Memory Modal -->
+  <div id="memory-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(7,0,15,0.95);z-index:100;align-items:center;justify-content:center;">
+    <div style="background:#0f0020;border:1px solid #a855f788;border-radius:8px;padding:24px;width:90%;max-width:360px;display:flex;flex-direction:column;gap:14px;max-height:90vh;overflow-y:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-family:'VT323',monospace;font-size:24px;color:#a855f7;letter-spacing:3px;">// AI MEMORY</span>
+        <button onclick="closeMemory()" style="background:transparent;border:none;color:#a855f7;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <div style="height:1px;background:#7c3aed44;"></div>
+      <label style="font-size:11px;color:#7c3aed;letter-spacing:1px;">YOUR NAME</label>
+      <input id="mem-name" type="text" style="background:#1a0030;border:1px solid #7c3aed55;color:#e9d5ff;font-family:'Share Tech Mono',monospace;font-size:13px;padding:10px;border-radius:4px;outline:none;" placeholder="e.g. Zan">
+      <label style="font-size:11px;color:#7c3aed;letter-spacing:1px;">CURRENT PROJECTS (comma separated)</label>
+      <input id="mem-projects" type="text" style="background:#1a0030;border:1px solid #7c3aed55;color:#e9d5ff;font-family:'Share Tech Mono',monospace;font-size:13px;padding:10px;border-radius:4px;outline:none;" placeholder="e.g. 3XPLOIT_OS, trading bot">
+      <label style="font-size:11px;color:#7c3aed;letter-spacing:1px;">PREFERENCES (comma separated)</label>
+      <input id="mem-prefs" type="text" style="background:#1a0030;border:1px solid #7c3aed55;color:#e9d5ff;font-family:'Share Tech Mono',monospace;font-size:13px;padding:10px;border-radius:4px;outline:none;" placeholder="e.g. JavaScript, dark themes, Node.js">
+      <label style="font-size:11px;color:#7c3aed;letter-spacing:1px;">FACTS ABOUT YOU (one per line)</label>
+      <textarea id="mem-facts" style="background:#1a0030;border:1px solid #7c3aed55;color:#e9d5ff;font-family:'Share Tech Mono',monospace;font-size:12px;padding:10px;border-radius:4px;outline:none;resize:vertical;min-height:80px;" placeholder="e.g. I use Android&#10;I code in Termux&#10;I prefer short answers"></textarea>
+      <div style="height:1px;background:#7c3aed44;"></div>
+      <button onclick="clearMemory()" style="background:#1a0030;color:#f87171;border:1px solid #f8717155;font-family:'Share Tech Mono',monospace;font-size:12px;padding:10px;border-radius:4px;cursor:pointer;">CLEAR MEMORY</button>
+      <button onclick="saveMemoryForm()" style="background:#7c3aed;color:#f5f3ff;border:none;font-family:'VT323',monospace;font-size:22px;padding:10px;border-radius:4px;cursor:pointer;letter-spacing:2px;">SAVE MEMORY</button>
+    </div>
+  </div>
+
+  <!-- GitHub Modal -->
+  <div id="github-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(7,0,15,0.95);z-index:100;align-items:center;justify-content:center;">
+    <div style="background:#0f0020;border:1px solid #a855f788;border-radius:8px;padding:24px;width:90%;max-width:360px;display:flex;flex-direction:column;gap:14px;max-height:90vh;overflow-y:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-family:'VT323',monospace;font-size:24px;color:#a855f7;letter-spacing:3px;">// GITHUB SYNC</span>
+        <button onclick="closeGithub()" style="background:transparent;border:none;color:#a855f7;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <div style="height:1px;background:#7c3aed44;"></div>
+      <label style="font-size:11px;color:#7c3aed;letter-spacing:1px;">GITHUB TOKEN</label>
+      <input id="gh-token" type="password" style="background:#1a0030;border:1px solid #7c3aed55;color:#e9d5ff;font-family:'Share Tech Mono',monospace;font-size:13px;padding:10px;border-radius:4px;outline:none;" placeholder="ghp_xxxxxxxxxxxx">
+      <label style="font-size:11px;color:#7c3aed;letter-spacing:1px;">REPO (user/repo)</label>
+      <input id="gh-repo" type="text" style="background:#1a0030;border:1px solid #7c3aed55;color:#e9d5ff;font-family:'Share Tech Mono',monospace;font-size:13px;padding:10px;border-radius:4px;outline:none;" placeholder="zanisd0pe-sketch/3xploit-os">
+      <label style="font-size:11px;color:#7c3aed;letter-spacing:1px;">FILENAME</label>
+      <input id="gh-filename" type="text" style="background:#1a0030;border:1px solid #7c3aed55;color:#e9d5ff;font-family:'Share Tech Mono',monospace;font-size:13px;padding:10px;border-radius:4px;outline:none;" placeholder="index.html">
+      <label style="font-size:11px;color:#7c3aed;letter-spacing:1px;">CONTENT</label>
+      <textarea id="gh-content" style="background:#1a0030;border:1px solid #7c3aed55;color:#e9d5ff;font-family:'Share Tech Mono',monospace;font-size:12px;padding:10px;border-radius:4px;outline:none;resize:vertical;min-height:80px;" placeholder="// paste code to push..."></textarea>
+      <div id="gh-status" style="font-size:11px;color:#7c3aed;letter-spacing:1px;min-height:16px;"></div>
+      <button onclick="pushToGithub()" style="background:#7c3aed;color:#f5f3ff;border:none;font-family:'VT323',monospace;font-size:22px;padding:10px;border-radius:4px;cursor:pointer;letter-spacing:2px;">PUSH TO GITHUB</button>
+    </div>
+  </div>
+
+  <!-- Snippets Modal -->
+  <div id="snippets-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(7,0,15,0.95);z-index:100;align-items:center;justify-content:center;">
+    <div style="background:#0f0020;border:1px solid #a855f788;border-radius:8px;padding:24px;width:90%;max-width:400px;display:flex;flex-direction:column;gap:12px;max-height:85vh;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-family:'VT323',monospace;font-size:24px;color:#a855f7;letter-spacing:3px;">// SNIPPETS</span>
+        <button onclick="closeSnippets()" style="background:transparent;border:none;color:#a855f7;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <div id="snippets-list" style="overflow-y:auto;display:flex;flex-direction:column;gap:10px;flex:1;"></div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(7,0,15,0.95);z-index:100;align-items:center;justify-content:center;">
+    <div style="background:#0f0020;border:1px solid #a855f788;border-radius:8px;padding:24px;width:90%;max-width:360px;display:flex;flex-direction:column;gap:16px;max-height:90vh;overflow-y:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-family:'VT323',monospace;font-size:24px;color:#a855f7;letter-spacing:3px;">// SETTINGS</span>
+        <button onclick="closeSettings()" style="background:transparent;border:none;color:#a855f7;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <div style="height:1px;background:#7c3aed44;"></div>
+      <label style="font-size:11px;color:#7c3aed;letter-spacing:1px;">AI NAME</label>
+      <input id="setting-ainame" type="text" style="background:#1a0030;border:1px solid #7c3aed55;color:#e9d5ff;font-family:'Share Tech Mono',monospace;font-size:13px;padding:10px;border-radius:4px;outline:none;" placeholder="3XPLOIT_AI">
+      <label style="font-size:11px;color:#7c3aed;letter-spacing:1px;">HACKER THEME</label>
+      <select id="setting-theme" style="background:#1a0030;border:1px solid #7c3aed55;color:#e9d5ff;font-family:'Share Tech Mono',monospace;font-size:13px;padding:10px;border-radius:4px;outline:none;">
+        <option value="purple">PURPLE GHOST</option>
+        <option value="matrix">MATRIX GREEN</option>
+        <option value="redteam">RED TEAM</option>
+        <option value="icehack">ICE HACK</option>
+        <option value="goldroot">GOLD ROOT</option>
+        <option value="phantom">PHANTOM WHITE</option>
+      </select>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <label style="font-size:11px;color:#7c3aed;letter-spacing:1px;">MATRIX RAIN</label>
+        <input id="setting-matrix" type="checkbox" style="width:20px;height:20px;cursor:pointer;">
+      </div>
+      <label style="font-size:11px;color:#7c3aed;letter-spacing:1px;">NEW PASSWORD</label>
+      <input id="setting-password" type="password" style="background:#1a0030;border:1px solid #7c3aed55;color:#e9d5ff;font-family:'Share Tech Mono',monospace;font-size:13px;padding:10px;border-radius:4px;outline:none;" placeholder="leave blank to keep current">
+      <label style="font-size:11px;color:#7c3aed;letter-spacing:1px;">CONFIRM PASSWORD</label>
+      <input id="setting-password-confirm" type="password" style="background:#1a0030;border:1px solid #7c3aed55;color:#e9d5ff;font-family:'Share Tech Mono',monospace;font-size:13px;padding:10px;border-radius:4px;outline:none;" placeholder="confirm new password">
+      <div style="height:1px;background:#7c3aed44;"></div>
+      <button onclick="clearChat()" style="background:#1a0030;color:#f87171;border:1px solid #f8717155;font-family:'Share Tech Mono',monospace;font-size:12px;padding:10px;border-radius:4px;cursor:pointer;letter-spacing:1px;">CLEAR CHAT HISTORY</button>
+      <div style="font-size:10px;color:#7c3aed;text-align:center;letter-spacing:1px;">3XPLOIT_OS v3.0 // BUILD 002</div>
+      <button onclick="saveSettingsForm()" style="background:#7c3aed;color:#f5f3ff;border:none;font-family:'VT323',monospace;font-size:22px;padding:10px;border-radius:4px;cursor:pointer;letter-spacing:2px;">SAVE CHANGES</button>
+    </div>
+  </div>
+
   <script src="/js/matrix.js"></script>
+  <script src="/js/sounds.js"></script>
+  <script src="/js/voice.js"></script>
+  <script src="/js/memory.js"></script>
+  <script src="/js/themes.js"></script>
   <script src="/js/chat.js"></script>
   <script src="/js/terminal.js"></script>
   <script src="/js/devtools.js"></script>
+  <script src="/js/snippets.js"></script>
+  <script src="/js/export.js"></script>
+  <script src="/js/codepreview.js"></script>
+  <script src="/js/codereview.js"></script>
+  <script src="/js/github.js"></script>
+  <script src="/js/realterm.js"></script>
+  <script src="/js/settings.js"></script>
   <script src="/js/app.js"></script>
 </body>
 </html>
